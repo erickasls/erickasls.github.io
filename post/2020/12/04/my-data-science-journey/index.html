@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Ericka Salas" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../img/favicon.ico">
+    <title>My Data Science Journey</title>
+    <meta name="generator" content="Hugo 0.79.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../../../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../../../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../../../../post/">BLOG</a></li>
+        
+        <li><a href="../../../../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../../../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../../../../post/2020/12/04/my-data-science-journey/">My Data Science Journey</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         December 4, 2020 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<p>My freshmen year at UT Austin I was unsure in the career I wanted to pursue. I started as a Public Health major and was on the Pre-Med track. It was the only career track I had interest at the time. It was until I became involved in the Freshmen Research Initiative program that made me realize what I wanted to pursue.</p>
+<div class="figure">
+<img src="../../../../../post/2020-12-04-my-data-science-journey_files/GIF-Alicia-Silverstone-Clueless-doubtful-grimace-not-really-skeptical-unsure-GIF.gif" />
+
+</div>
+<div id="spring-2019" class="section level2">
+<h2>Spring 2019</h2>
+<p>I was in the Big Data in Biology cohort and became exposed to Python and RNA-seq data analysis. Through this course I was introduced to important Data Science/Bioinformatics tools such as Pandas, Numpy, packages, etc.</p>
+<p>I still remember creating my first pandas dataframe. This is the code that I wrote.</p>
+<pre class="python"><code>import pandas as pd #doesnt have to be called pd but it is mainly called this
+walrus_data = {&#39;name&#39;: [&#39;Antje&#39;, &#39;ET&#39;, &#39;Jocko&#39;] ,
+               &#39;gender&#39;: [&#39;Female&#39;,&#39;Male&#39;,&#39;Male&#39;], 
+               &#39;weight&#39;: [2000,3400,3000]}
+walruses = pd.DataFrame(walrus_data) #turns it into a data frame/ the cute chart
+walruses.head(2)</code></pre>
+<pre><code>##    gender   name  weight
+## 0  Female  Antje    2000
+## 1    Male     ET    3400</code></pre>
+<pre class="python"><code>walruses.shape #pandas associates every attribute in the data frame</code></pre>
+<pre><code>## (3, 3)</code></pre>
+<p>The entire semester picked up and for my final project I performed an RNA-seq data analysis of patients with Parkinson's disease. The goal was to find dyregulated pathways in Parkinson's and operations were done using Python, PANDAS dataframes, and clustermap/heatmaps for aid in statistical testing.</p>
+</div>
+<div id="fall-2019" class="section level2">
+<h2>Fall 2019</h2>
+<p>This semester I pursued an independent research study course as part of my FRI bioinformatics lab. I was assigned a major project with a PI from Dell Medical School named Dr. Mbemba Jabbi. Under this lab for this semester, our goal was to find transcriptomic signatures for mood disorders (bipolar disorder and major depression disorder) within the anterior insula cortex of the brain. I was a key player in the cluster analysis using a weighted-gene package in R and performed a network analysis of large, high-dimensional datasets of patients with depression and biploar disorder. I also took on the challege of identifying the differentially expressed genes and disregulated pathways.</p>
+<p>This is the workflow for the project: <img src="../../../../../post/2020-12-04-my-data-science-journey_files/Screen%20Shot%202020-12-11%20at%2010.16.21%20PM.png" /></p>
+</div>
+<div id="springsummer-2020" class="section level2">
+<h2>Spring/Summer 2020</h2>
+<p>During this semester, I part-timed continued the research from the Jabbi lab and began analyzing a different brain region called the subgenual cingulate. I continued performing WGCNA or cluster analysis on this region and began comparing it to the insula portion. I produced enough results for an analysis to begin, however, the research was paused due to the COVID-19 pandemic closing campus.</p>
+<div class="figure">
+<img src="../../../../../post/2020-12-04-my-data-science-journey_files/giphy.gif" />
+
+</div>
+</div>
+<div id="fall-2020" class="section level2">
+<h2>Fall 2020</h2>
+<p>This semester was probably my hardest one yet, considering the ongoing COVID-19 pandemic. It was difficult to adapt to do everything 100% in front of a screen with minimum human interaction. All of my research meetings were online and I finished up the subgenual cingulate portion. I picked up another brain region called the dorsal cingulate cortex and performed the same type of weighted-gene cluster analysis.</p>
+<p>During this semester, I registered for two other data science related courses. One called Computational Biology and the other was a Data Mining course. Both introduced me more to the data science world and tools. I learned algorithms such a k-means clustering, hierarchal clustering, k-nearest neighbors, bootstrapping, regression, etc. Between the two classes, I learned how to explore data, analyze it, and create algorithms that facilitate data exploration.</p>
+<p>These are a few of the topics that I learned from Computational Biology &amp; Bioinformatics: - Data visualization - Data wrangling - Cluster Analysis - Principle Component Analysis (PCA) - Regression - Cross Validation</p>
+<p>Here is an example of R code done! A scatter plot of earthquake data was being made.</p>
+<pre class="r"><code>stations &lt;- quakes$stations
+plot(x = quakes$mag, y = stations)</code></pre>
+<p><img src="../../../../../post/2020-12-04-my-data-science-journey_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>These are a few topic that I learned from the Data Mining course: - Decision Trees - Overfitting and Cross Validation - Naive Bayes - K-nearest neighbors - Neural Networks - Density Based Clustering - Hierarchical Clustering</p>
+</div>
+<div id="my-next-steps" class="section level2">
+<h2>My Next Steps</h2>
+<p>My goals continue to be within the data science field and I have multiple plans to achieve. I first plan to continue my research with the Jabbi lab since there are further analysis that my team hopes to achieve such as a Gene Wide Association Study (GWAS) and cluster analysis on another brain region. I also hope to begin publishing these results on a peer reviewed research paper!</p>
+<p>I also accepted an internship offer as a Data Engineering Intern at an insurance bank company called USAA. Even though it is not precisely data science, I will still be exploring the worlds and wonders of data, and I could not be anymore excited!</p>
+<div class="figure">
+<img src="../../../../../post/2020-12-04-my-data-science-journey_files/usaaa%20logo1.png" />
+
+</div>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../../../../js/docs.min.js"></script>
+<script src="../../../../../js/main.js"></script>
+
+<script src="../../../../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

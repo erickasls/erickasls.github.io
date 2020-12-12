@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Ericka Salas" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../img/favicon.ico">
+    <title>Project 2: Modeling, Testing, and Predicting</title>
+    <meta name="generator" content="Hugo 0.79.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../post/">BLOG</a></li>
+        
+        <li><a href="../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../project/project2/">Project 2: Modeling, Testing, and Predicting</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         January 1, 0001 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<div id="modeling-testing-and-predicting" class="section level2">
+<h2><strong>Modeling, Testing, and Predicting</strong></h2>
+<p><strong>Analysis of Attitude Towards Science Survey</strong> <em>Project by: Ericka Salas (efs554)</em></p>
+</div>
+<div id="introducing-dataset---science-study" class="section level2">
+<h2>Introducing Dataset - Science Study!</h2>
+<p>Growing up I loved science and I continue to do so. Though, how do other people feel about science based on different factors? The dataset that I am analyzing is a school science survey dataset that is based on the attitudes to science based on sex, private or public school, and class in two different Australian states. The numeric variables are the school code, class, and the likliness of the subject of science. The categorical variables are sex, states, and whether the student is in a private or public school. There are a total of 1385 observations that are mainly measuring the attitude towards science based on different factors.</p>
+<pre class="r"><code>science &lt;- read.csv(&quot;science.csv&quot;) %&gt;% na.omit()
+head(science)</code></pre>
+<pre><code>##   X State PrivPub school class sex like Class
+## 1 1   ACT  public      1     1   f    8   1.1
+## 2 2   ACT  public      1     1   f    6   1.1
+## 3 3   ACT  public      1     1   f    5   1.1
+## 4 4   ACT  public      1     1   f    2   1.1
+## 5 6   ACT  public      1     1   f    5   1.1
+## 6 7   ACT  public      1     1   f    6   1.1</code></pre>
+</div>
+<div id="part-1-conducting-manova-test" class="section level2">
+<h2><strong>Part 1: Conducting Manova Test</strong></h2>
+<pre class="r"><code>library(rstatix)
+
+group &lt;- science$State 
+DVs &lt;- science %&gt;% select(like,class)
+
+#Test multivariate normality for each group (null: assumption met)
+sapply(split(DVs,group), mshapiro_test)</code></pre>
+<pre><code>##           ACT          NSW      
+## statistic 0.9349495    0.9696399
+## p.value   1.113207e-23 0.234296</code></pre>
+<pre class="r"><code>#Box&#39;s M test (null: homogeneity of vcov mats assumption met)
+box_m(DVs, group)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+## statistic p.value parameter method
+## &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
+## 1 26.5 0.00000742 3 Box&#39;s M-test for Homogeneity of
+Covariance Matrices</code></pre>
+<pre class="r"><code>#Optionally View covariance matrices for each group
+lapply(split(DVs,group), cov)</code></pre>
+<pre><code>## $ACT
+##             like      class
+## like  3.43714789 0.04077556
+## class 0.04077556 0.69198615
+## 
+## $NSW
+##             like      class
+## like   2.1751701 -0.2363946
+## class -0.2363946  0.2551020</code></pre>
+<pre class="r"><code>#Performing the MANOVA Test
+man &lt;- manova(cbind(like,Class)~State, data = science)
+summary(man)</code></pre>
+<pre><code>## Df Pillai approx F num Df den Df Pr(&gt;F)
+## State 1 0.10968 85.004 2 1380 &lt; 2.2e-16 ***
+## Residuals 1381
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>#Since it is significant, this gets the univarate ANOVAs
+summary.aov(man)</code></pre>
+<pre><code>## Response like :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## State 1 7.6 7.6409 2.2518 0.1337
+## Residuals 1381 4686.1 3.3933
+##
+## Response Class :
+## Df Sum Sq Mean Sq F value Pr(&gt;F)
+## State 1 19620 19620.1 170.04 &lt; 2.2e-16 ***
+## Residuals 1381 159352 115.4
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>science %&gt;% group_by(State) %&gt;% summarize(mean(like), mean(Class))</code></pre>
+<pre><code>## # A tibble: 2 x 3
+##   State `mean(like)` `mean(Class)`
+##   &lt;fct&gt;        &lt;dbl&gt;         &lt;dbl&gt;
+## 1 ACT           5.10          20.6
+## 2 NSW           4.69          41.0</code></pre>
+<pre class="r"><code>pairwise.t.test(science$like, science$State, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  science$like and science$State 
+## 
+##     ACT 
+## NSW 0.13
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(science$Class,science$State, p.adj=&quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  science$Class and science$State 
+## 
+##     ACT   
+## NSW &lt;2e-16
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>typeone = 1 - .95^7
+typeone</code></pre>
+<pre><code>## [1] 0.3016627</code></pre>
+<p>Since one Manova, two Anovas, and a total of 4 t-tests were done. This all adds up to a total of 7 tests done. The type one error rate is 0.3016627. The bonferroni coefficient and adjusted significance level is 0.007.</p>
+<p><em>Analysis/Write-Up</em> A one-way MANOVA was conducted to determine the effect of the Australian State (ACT, NSW) on two dependent variables (Likeliness of Science, Class).</p>
+<p>There were significant differences found among the two states for at least one of the dependent variables. Pillai trace = 0.1097, F(1382) = 85.147, p &lt; 0.0001.</p>
+<p>Univariate ANOVAs for each dependent variable were conducted as follow-up tests to the MANOVA, using the Bonferroni method for controlling Type I error rates for multiple comparisons. The univariate ANOVAs for likeliness were not significant (P = 0.1335) and were significant for Class (P &lt; 0.0001).</p>
+<p>Post hoc analysis was performed conducting pairwise comparisons to determine which States differed in likeness of science and Class. Both States were found to differ significantly from each other in terms of science like and class after adjusting for multiple comparisons (bonferroni).</p>
+<p>Pillai trace = 0.1097, p &lt; 0.0001. α = .05/7 = .007</p>
+</div>
+<div id="part-2-randomization-test" class="section level2">
+<h2><em>Part 2: Randomization Test</em></h2>
+<p>Create a plot visualizing the null distribution and the test statistic (3).</p>
+<pre class="r"><code>#Performing Randomization Test on T-stat
+t.test(data = science,like~PrivPub) </code></pre>
+<pre><code>##
+## Welch Two Sample t-test
+##
+## data: like by PrivPub
+## t = -3.7254, df = 879.13, p-value = 0.0002074
+## alternative hypothesis: true difference in means is not
+equal to 0
+## 95 percent confidence interval:
+## -0.6018079 -0.1865014
+## sample estimates:
+## mean in group private mean in group public
+## 4.816372 5.210526</code></pre>
+<pre class="r"><code>#Running the Randomization Test
+science %&gt;% group_by(PrivPub) %&gt;% summarize(mean=mean(like)) %&gt;% summarize(diff(mean))</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   `diff(mean)`
+##          &lt;dbl&gt;
+## 1        0.394</code></pre>
+<pre class="r"><code>rand_dist&lt;-vector()
+for(i in 1:5000){
+new &lt;- data.frame(like = sample(science$like), PrivPub = science$PrivPub)
+rand_dist[i]&lt;-mean(new[new$PrivPub==&quot;public&quot;,]$time)-
+mean(new[new$PrivPub==&quot;private&quot;,]$time)
+}
+#hist(rand_dist,main=&quot;&quot;,ylab=&quot;&quot;)</code></pre>
+<p>Null Hypothesis: Mean liklihood of science is the same for both public and private school students. Alternative Hypothesis: Mean liklihood of science is different for both public and private school students.</p>
+<p>There is a true difference in means of students who like science in public school and private schools. Therefore, we reject the null hypothesis. (t = -3.7237, df = 877.64, p = 0.0002089)</p>
+</div>
+<div id="part-3-lr-model" class="section level2">
+<h2><strong>Part 3: LR Model</strong></h2>
+<pre class="r"><code>library(&quot;lmtest&quot;)
+#Mean centering any numeric variables 
+science$like_c &lt;- science$like - mean(science$like)
+#building a linear regression model with interation
+fit&lt;-lm(Class ~ like_c * PrivPub, data = science)
+summary(fit)</code></pre>
+<pre><code>##
+## Call:
+## lm(formula = Class ~ like_c * PrivPub, data = science)
+##
+## Residuals:
+## Min 1Q Median 3Q Max
+## -15.3708 -6.1515 0.6646 4.9969 15.5162
+##
+## Coefficients:
+## Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) 33.36447 0.36548 91.290 &lt;2e-16 ***
+## like_c 0.08539 0.19514 0.438 0.662
+## PrivPubpublic -17.85229 0.44434 -40.177 &lt;2e-16 ***
+## like_c:PrivPubpublic -0.36925 0.23918 -1.544 0.123
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1
+##
+## Residual standard error: 7.692 on 1379 degrees of
+freedom
+## Multiple R-squared: 0.5441, Adjusted R-squared: 0.5431
+## F-statistic: 548.7 on 3 and 1379 DF, p-value: &lt; 2.2e-16</code></pre>
+<p>Intercept: The mean predicted likliness of science for non private school students is 33.36446. For students that are in public school, a student who likes science are on average 17.84454 less than a student in private school. The interaction of students on average who like science in a public school is 0.369 less than a student in a private school.</p>
+<pre class="r"><code>science %&gt;% ggplot(aes(like_c, Class, color = PrivPub)) + geom_point() + geom_smooth(method = &quot;lm&quot;) </code></pre>
+<p><img src="../../project/Project2_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#make histogram of residuals
+resids&lt;-lm(like_c~Class, data=science)$residuals
+ggplot()+geom_histogram(aes(resids),bins=10)</code></pre>
+<p><img src="../../project/Project2_files/figure-html/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#plot residuals vs. fitted values
+fitted&lt;-lm(like_c~Class, data=science)$fitted.values
+ggplot()+geom_point(aes(fitted,resids))</code></pre>
+<p><img src="../../project/Project2_files/figure-html/unnamed-chunk-9-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>resids&lt;-fit$residuals
+fitvals&lt;-fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color=&#39;red&#39;)</code></pre>
+<p><img src="../../project/Project2_files/figure-html/unnamed-chunk-9-3.png" width="768" style="display: block; margin: auto;" /> Based on the graphs of residuals and histograms, the assumptions of linearity, normality, and homoskedasticity appear to be violated. However, the normality assumption appears the least violated due to the histogram slighlty looking normal distribution.</p>
+<pre class="r"><code>library(&quot;sandwich&quot;)
+coeftest(fit, vcov = vcovHC(fit))[,1:2]</code></pre>
+<pre><code>##                          Estimate Std. Error
+## (Intercept)           33.36447026  0.2676107
+## like_c                 0.08538685  0.1526248
+## PrivPubpublic        -17.85228513  0.3861879
+## like_c:PrivPubpublic  -0.36925227  0.2131576</code></pre>
+<pre class="r"><code>(sum((science$like-mean(science$like))^2)-sum(fit$residuals^2))/sum((science$like-mean(science$like))^2)</code></pre>
+<pre><code>## [1] -16.38192</code></pre>
+<p>The proportion of variation that the model explains is -16.3827.</p>
+</div>
+<div id="part-4-rerum-lr-model" class="section level2">
+<h2><strong>Part 4: Rerum LR Model</strong></h2>
+<p>Rerun same regression model (with the interaction), but this time compute bootstrapped standard errors (either by resampling observations or residuals). Discuss any changes you observe in SEs and p-values using these SEs compared to the original SEs and the robust SEs)</p>
+<pre class="r"><code>fit&lt;-lm(like~Class + PrivPub, data=science) #fit model
+resids&lt;-fit$residuals #save residuals
+fitted&lt;-fit$fitted.values #save yhats
+resid_resamp&lt;-replicate(5000,{
+new_resids&lt;-sample(resids,replace=TRUE) #resample resids w/ replacement
+science$new_y&lt;-fitted+new_resids #add new resids to yhats to get new &quot;data&quot;
+fit&lt;-lm(new_y~Class + PrivPub,data=science) #refit model
+coef(fit) #save coefficient estimates (b0, b1, etc)
+})
+resid_resamp%&gt;%t%&gt;%as.data.frame%&gt;%summarize_all(sd)</code></pre>
+<pre><code>##   (Intercept)       Class PrivPubpublic
+## 1   0.2303765 0.006431209     0.1553071</code></pre>
+<p>There are a few changes to the SEs before and after the adjustment. The original SEs for class and private/public variable were higher than the bootstrapped SEs. For example, at first the PrivPub SE was 0.3857914 and then was 0.1566013.</p>
+<ul>
+<li><p><strong>Part 5: </strong> Fit a logistic regression model predicting a binary variable (if you don't have one, make/get one) from at least two explanatory variables (interaction not necessary).</p>
+<pre class="r"><code>#create a binary categorical variable
+science1 &lt;- science %&gt;% na.omit() %&gt;% mutate(y=ifelse(sex==&quot;m&quot;,1,0))
+fit1 &lt;- glm(y~like_c,data=science1, family=&quot;binomial&quot;)
+coeftest(fit1)</code></pre>
+<pre><code>## 
+## z test of coefficients:
+## 
+##              Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) 0.0014326  0.0538237  0.0266   0.9788
+## like_c      0.0439133  0.0292525  1.5012   0.1333</code></pre>
+<pre class="r"><code>exp(coef(fit1))</code></pre>
+<pre><code>## (Intercept)      like_c 
+##    1.001434    1.044892</code></pre>
+<p>Coefficients: Intercept: For students in either ACT or NSW states and regardless of sex, like = 0, private = 0, public = 0, is 1.001428</p></li>
+</ul>
+<p>Like_c: Controlling for public or private school, for every point of likelihood, the outcome of the student being a male increases by 1.089.</p>
+<pre class="r"><code>probs &lt;- predict(fit1, type = &quot;response&quot;)
+table(predict = as.numeric(probs &gt; 0.5), truth = science1$y) %&gt;% addmargins</code></pre>
+<pre><code>##        truth
+## predict    0    1  Sum
+##     0    377  335  712
+##     1    314  357  671
+##     Sum  691  692 1383</code></pre>
+<pre class="r"><code>class_diag &lt;- function(probs,truth){
+#CONFUSION MATRIX: CALCULATE ACCURACY, TPR, TNR, PPV
+
+if(is.character(truth)==TRUE) truth&lt;-as.factor(truth)
+if(is.numeric(truth)==FALSE &amp; is.logical(truth)==FALSE) truth&lt;-as.numeric(truth)-1
+
+tab&lt;-table(factor(probs&gt;.5,levels=c(&quot;FALSE&quot;,&quot;TRUE&quot;)),factor(truth, levels=c(0,1)))
+acc=sum(diag(tab))/sum(tab)
+sens=tab[2,2]/colSums(tab)[2]
+spec=tab[1,1]/colSums(tab)[1]
+ppv=tab[2,2]/rowSums(tab)[2]
+f1=2*(sens*ppv)/(sens+ppv)
+
+#CALCULATE EXACT AUC
+ord&lt;-order(probs, decreasing=TRUE)
+probs &lt;- probs[ord]; truth &lt;- truth[ord]
+
+TPR=cumsum(truth)/max(1,sum(truth)) 
+FPR=cumsum(!truth)/max(1,sum(!truth))
+
+dup&lt;-c(probs[-1]&gt;=probs[-length(probs)], FALSE)
+TPR&lt;-c(0,TPR[!dup],1); FPR&lt;-c(0,FPR[!dup],1)
+n &lt;- length(TPR)
+auc&lt;- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+data.frame(acc,sens,spec,ppv,f1,auc)
+}</code></pre>
+<pre class="r"><code>class_diag(probs, truth = science1$y)</code></pre>
+<pre><code>## acc sens spec ppv f1 auc
+## 1 0.5307303 0.515896 0.5455861 0.5320417 0.5238445
+0.5334974</code></pre>
+<p>The accuracy of the model is 0.5307, its true positive rate is 0.515, and its true negative rate is 0.5455. The positive predictive rate is 0.5320 and the AUC of the model is 0.5335.</p>
+<pre class="r"><code>science1$logit&lt;-predict(fit1,type=&quot;link&quot;)
+science1%&gt;%ggplot(aes(logit,color=sex,fill=sex))+geom_density(alpha=.4)+
+theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab(&quot;predictor (logit)&quot;)</code></pre>
+<p><img src="../../project/Project2_files/figure-html/unnamed-chunk-17-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>library(plotROC)
+science1$prob &lt;- predict(fit1, type = &quot;response&quot;)
+ROCplot &lt;- ggplot(science1) + geom_roc(aes(d = y, m = prob), n.cuts = 0) + geom_segment(aes(x=0,xend=1, y=0, yend = 1), lty=2)
+ROCplot</code></pre>
+<p><img src="../../project/Project2_files/figure-html/unnamed-chunk-18-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.5334974</code></pre>
+<p>The area under the curve or the AUC is 0.53349.</p>
+</div>
+<div id="part-5-lasso" class="section level2">
+<h2><strong>Part 5: LASSO </strong></h2>
+<pre class="r"><code>fit3&lt;-glm(y~class+Class+like, data=science1, family=&quot;binomial&quot;)
+coeftest(fit3)</code></pre>
+<pre><code>##
+## z test of coefficients:
+##
+## Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept) -0.2488047 0.2148842 -1.1579 0.246923
+## class 0.2096216 0.0670087 3.1283 0.001758 **
+## Class -0.0116442 0.0048172 -2.4172 0.015639 *
+## like 0.0351445 0.0295547 1.1891 0.234387
+## ---
+## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1
+&#39; &#39; 1</code></pre>
+<pre class="r"><code>exp(coef(fit3))</code></pre>
+<pre><code>## (Intercept)       class       Class        like 
+##   0.7797322   1.2332113   0.9884234   1.0357694</code></pre>
+<pre class="r"><code>probs2 &lt;- predict(fit3, type = &quot;response&quot;)
+class_diag(probs2, science1$y)</code></pre>
+<pre><code>## acc sens spec ppv f1 auc
+## 1 0.537961 0.5202312 0.5557164 0.5397301 0.5298013
+0.5583043</code></pre>
+<p>The model is 0.538 accurate with a true positive rate of 0.5202 and a true negative rate of 0.5557. The positive predictive rate is 0.5397 and auc (area under the curve) is 0.5583.</p>
+<pre class="r"><code>set.seed(1234)
+fraction&lt;-0.5 #choose proportion of rows to train
+train_n&lt;-floor(fraction*nrow(science1)) #number of rows to train
+iter &lt;- 500 #number of iterations
+diags&lt;-NULL
+for(i in 1:iter){
+## Create training and test sets
+train_index&lt;-sample(1:nrow(science1),size=train_n)
+train&lt;-science1[train_index,]
+test&lt;-science1[-train_index,]
+truth&lt;-test$y
+## Train model on training set
+fit&lt;-glm(y~(.)^2,data=train,family=&quot;binomial&quot;)
+## Test model on test set, get diagnostics
+probs&lt;-predict(fit3,newdata = test,type=&quot;response&quot;)
+diags&lt;-rbind(diags,class_diag(probs,truth))
+}
+summarize_all(diags,mean)</code></pre>
+<pre><code>## acc sens spec ppv f1 auc
+## 1 0.537026 0.5196131 0.5545113 0.5389891 0.5289284
+0.5576631</code></pre>
+<p>After performing the cross validation above, the classification metrics slightly changed. A few of the values increased or decreased slightly. The AUC changed very slightly. Since the metrics did not change much, we can indicate that the model is not overfitted.</p>
+<pre class="r"><code>library(glmnet)
+
+y&lt;-as.matrix(science1$y) #grab response
+x&lt;-model.matrix(y~.,data=science1)[,-1] #grab predictors
+cv &lt;- cv.glmnet(x,y,family=&quot;binomial&quot;)
+lasso&lt;-glmnet(x,y,family=&quot;binomial&quot;,lambda=cv$lambda.1se)
+coef(lasso)</code></pre>
+<pre><code>## 12 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                     s0
+## (Intercept)   -7.29711
+## X              .      
+## StateNSW       .      
+## PrivPubpublic  .      
+## school         .      
+## class          .      
+## sexm          14.59567
+## like           .      
+## Class          .      
+## like_c         .      
+## logit          .      
+## prob           .</code></pre>
+<p>After performing LASSO on the model the only variable retain is the sex of the student.</p>
+<pre class="r"><code>set.seed(1234)
+k=10
+data &lt;- science1 %&gt;% sample_frac #put rows of dataset in random order
+folds &lt;- ntile(1:nrow(data),n=10) #create fold labels
+diags&lt;-NULL
+for(i in 1:k){
+train &lt;- data[folds!=i,] #create training set (all but fold i)
+test &lt;- data[folds==i,] #create test set (just fold i)
+truth &lt;- test$y #save truth labels from fold i
+fit &lt;- glm(y~like,
+data=train, family=&quot;binomial&quot;)
+probs &lt;- predict(fit, newdata=test, type=&quot;response&quot;)
+diags&lt;-rbind(diags,class_diag(probs,truth))
+}
+diags%&gt;%summarize_all(mean)</code></pre>
+<pre><code>## acc sens spec ppv f1 auc
+## 1 0.5242519 0.6148693 0.4438597 0.522069 0.5572307
+0.5330275</code></pre>
+<p>The model's out of sample AUC is very similar (0.533) to the logistic regression above (0.5583).</p>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../js/docs.min.js"></script>
+<script src="../../js/main.js"></script>
+
+<script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

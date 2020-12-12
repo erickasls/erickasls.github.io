@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Projects on Ericka Salas</title>
+    <link>/project/</link>
+    <description>Recent content in Projects on Ericka Salas</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language><atom:link href="/project/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Project 1: Exploratory Data Analysis</title>
+      <link>/project/project1/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project1/</guid>
+      <description>Data Wrangling and Data Exploration Broadway Data Analysis Project by: Ericka Salas (efs554)
+ Introduction of Broadway Data Before the COVID-19 pandemic hit, I worked at a box office on UT Austin&#39;s campus that mainly sold tickets to concerts and broadway performances. I became a huge broadway fan and for the past two years of working in the office, attending broadway musicals has always been fun and exciting. I miss the feeling of the lights dimming at the beginning of a show or intermission conversations on the songs I enjoyed the most.</description>
+    </item>
+    
+    <item>
+      <title>Project 2: Modeling, Testing, and Predicting</title>
+      <link>/project/project2/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project2/</guid>
+      <description>Modeling, Testing, and Predicting Analysis of Attitude Towards Science Survey Project by: Ericka Salas (efs554)
+ Introducing Dataset - Science Study! Growing up I loved science and I continue to do so. Though, how do other people feel about science based on different factors? The dataset that I am analyzing is a school science survey dataset that is based on the attitudes to science based on sex, private or public school, and class in two different Australian states.</description>
+    </item>
+    
+  </channel>
+</rss>

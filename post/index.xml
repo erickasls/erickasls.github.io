@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Ericka Salas</title>
+    <link>/post/</link>
+    <description>Recent content in Posts on Ericka Salas</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Fri, 04 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>My Data Science Journey</title>
+      <link>/post/2020/12/04/my-data-science-journey/</link>
+      <pubDate>Fri, 04 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2020/12/04/my-data-science-journey/</guid>
+      <description>My freshmen year at UT Austin I was unsure in the career I wanted to pursue. I started as a Public Health major and was on the Pre-Med track. It was the only career track I had interest at the time. It was until I became involved in the Freshmen Research Initiative program that made me realize what I wanted to pursue.
+ Spring 2019 I was in the Big Data in Biology cohort and became exposed to Python and RNA-seq data analysis.</description>
+    </item>
+    
+  </channel>
+</rss>

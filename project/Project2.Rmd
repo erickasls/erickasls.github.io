@@ -1,0 +1,317 @@
+---
+title: 'Project 2: Modeling, Testing, and Predicting'
+author: "SDS348"
+date: ''
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+---
+## **Modeling, Testing, and Predicting**
+**Analysis of Attitude Towards Science Survey** 
+*Project by: Ericka Salas (efs554)*  
+
+```{r setup, include=FALSE}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE,fig.align="center",warning=FALSE,message=FALSE,fig.width=8, fig.height=5, linewidth=60)
+options(tibble.width = 100,width = 100)
+library(tidyverse)
+```
+
+## Introducing Dataset - Science Study!
+
+Growing up I loved science and I continue to do so. Though, how do other people feel about science based on different factors? The dataset that I am analyzing is a school science survey dataset that is based on the attitudes to science based on sex, private or public school, and class in two different Australian states. The numeric variables are the school code, class, and the likliness of the subject of science. The categorical variables are sex, states, and whether the student is in a private or public school. There are a total of 1385 observations that are mainly measuring the attitude towards science based on different factors.
+
+```{r}
+science <- read.csv("science.csv") %>% na.omit()
+head(science)
+```
+
+##**Part 1:  Conducting Manova Test** 
+
+```{r}
+library(rstatix)
+
+group <- science$State 
+DVs <- science %>% select(like,class)
+
+#Test multivariate normality for each group (null: assumption met)
+sapply(split(DVs,group), mshapiro_test)
+
+#Box's M test (null: homogeneity of vcov mats assumption met)
+box_m(DVs, group)
+
+#Optionally View covariance matrices for each group
+lapply(split(DVs,group), cov)
+```
+
+```{r}
+#Performing the MANOVA Test
+man <- manova(cbind(like,Class)~State, data = science)
+summary(man)
+```
+
+```{r}
+#Since it is significant, this gets the univarate ANOVAs
+summary.aov(man)
+science %>% group_by(State) %>% summarize(mean(like), mean(Class))
+```
+
+```{r}
+pairwise.t.test(science$like, science$State, p.adj = "none")
+pairwise.t.test(science$Class,science$State, p.adj="none")
+typeone = 1 - .95^7
+typeone
+```
+Since one Manova, two Anovas, and a total of 4 t-tests were done. This all adds up to a total of 7 tests done. The type one error rate is 0.3016627. The bonferroni coefficient and adjusted significance level is 0.007.
+
+*Analysis/Write-Up*
+A one-way MANOVA was conducted to determine the effect of the Australian State (ACT,
+NSW) on two dependent variables (Likeliness of Science, Class).
+
+There were significant differences found among the two states for at least one of the
+dependent variables. Pillai trace =  0.1097, F(1382) = 85.147, p < 0.0001.
+
+Univariate ANOVAs for each dependent variable were conducted as follow-up tests to the
+MANOVA, using the Bonferroni method for controlling Type I error rates for multiple
+comparisons. The univariate ANOVAs for likeliness were not significant (P = 0.1335) and were significant for Class (P < 0.0001).
+
+Post hoc analysis was performed conducting pairwise comparisons to determine which
+States differed in likeness of science and Class. Both States were found to differ
+significantly from each other in terms of science like and class after adjusting for multiple comparisons (bonferroni). 
+
+Pillai trace = 0.1097, p < 0.0001.
+α = .05/7 = .007
+
+
+##*Part 2: Randomization Test*
+
+Create a plot visualizing the null distribution and the test statistic (3).
+```{r}
+#Performing Randomization Test on T-stat
+t.test(data = science,like~PrivPub) 
+
+#Running the Randomization Test
+science %>% group_by(PrivPub) %>% summarize(mean=mean(like)) %>% summarize(diff(mean))
+
+rand_dist<-vector()
+for(i in 1:5000){
+new <- data.frame(like = sample(science$like), PrivPub = science$PrivPub)
+rand_dist[i]<-mean(new[new$PrivPub=="public",]$time)-
+mean(new[new$PrivPub=="private",]$time)
+}
+#hist(rand_dist,main="",ylab="")
+```
+
+Null Hypothesis: Mean liklihood of science is the same for both public and private school students.
+Alternative Hypothesis: Mean liklihood of science is different for both public and private school students.
+
+There is a true difference in means of students who like science in public school and private schools. Therefore, we reject the null hypothesis. (t = -3.7237, df = 877.64, p = 0.0002089)
+
+
+##**Part 3: LR Model**
+
+```{r}
+library("lmtest")
+#Mean centering any numeric variables 
+science$like_c <- science$like - mean(science$like)
+#building a linear regression model with interation
+fit<-lm(Class ~ like_c * PrivPub, data = science)
+summary(fit)
+```
+Intercept: The mean predicted likliness of science for non private school students is 33.36446. 
+For students that are in public school, a student who likes science are on average 17.84454 less than a student in private school. 
+The interaction of students on average who like science in a public school is 0.369 less than a student in a private school. 
+
+
+```{r}
+science %>% ggplot(aes(like_c, Class, color = PrivPub)) + geom_point() + geom_smooth(method = "lm") 
+```
+
+```{r}
+#make histogram of residuals
+resids<-lm(like_c~Class, data=science)$residuals
+ggplot()+geom_histogram(aes(resids),bins=10)
+#plot residuals vs. fitted values
+fitted<-lm(like_c~Class, data=science)$fitted.values
+ggplot()+geom_point(aes(fitted,resids))
+resids<-fit$residuals
+fitvals<-fit$fitted.values
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color='red')
+```
+Based on the graphs of residuals and histograms, the assumptions of linearity, normality, and homoskedasticity appear to be violated. However, the normality assumption appears the least violated due to the histogram slighlty looking normal distribution. 
+
+```{r}
+library("sandwich")
+coeftest(fit, vcov = vcovHC(fit))[,1:2]
+```
+
+```{r}
+(sum((science$like-mean(science$like))^2)-sum(fit$residuals^2))/sum((science$like-mean(science$like))^2)
+```
+The proportion of variation that the model explains is -16.3827. 
+
+##**Part 4: Rerum LR Model** 
+
+Rerun same regression model (with the interaction), but this time compute bootstrapped standard errors (either by resampling observations or residuals). Discuss any changes you observe in SEs and p-values using these SEs compared to the original SEs and the robust SEs)
+```{r}
+fit<-lm(like~Class + PrivPub, data=science) #fit model
+resids<-fit$residuals #save residuals
+fitted<-fit$fitted.values #save yhats
+resid_resamp<-replicate(5000,{
+new_resids<-sample(resids,replace=TRUE) #resample resids w/ replacement
+science$new_y<-fitted+new_resids #add new resids to yhats to get new "data"
+fit<-lm(new_y~Class + PrivPub,data=science) #refit model
+coef(fit) #save coefficient estimates (b0, b1, etc)
+})
+resid_resamp%>%t%>%as.data.frame%>%summarize_all(sd)
+```
+There are a few changes to the SEs before and after the adjustment. The original SEs for class and private/public variable were higher than the bootstrapped SEs. For example, at first the PrivPub SE was 0.3857914 and then was 0.1566013. 
+
+- **Part 5: ** Fit a logistic regression model predicting a binary variable (if you don't have one, make/get one) from at least two explanatory variables (interaction not necessary). 
+    
+    ```{r}
+#create a binary categorical variable
+science1 <- science %>% na.omit() %>% mutate(y=ifelse(sex=="m",1,0))
+fit1 <- glm(y~like_c,data=science1, family="binomial")
+coeftest(fit1)
+exp(coef(fit1))
+```
+Coefficients:
+Intercept: For students in either ACT or NSW states and regardless of sex, like = 0, private = 0, public = 0, is 1.001428 
+
+Like_c: Controlling for public or private school, for every point of likelihood, the outcome of the student being a male increases by 1.089. 
+
+```{r}
+probs <- predict(fit1, type = "response")
+table(predict = as.numeric(probs > 0.5), truth = science1$y) %>% addmargins
+```
+    
+```{r}
+class_diag <- function(probs,truth){
+#CONFUSION MATRIX: CALCULATE ACCURACY, TPR, TNR, PPV
+
+if(is.character(truth)==TRUE) truth<-as.factor(truth)
+if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+
+tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),factor(truth, levels=c(0,1)))
+acc=sum(diag(tab))/sum(tab)
+sens=tab[2,2]/colSums(tab)[2]
+spec=tab[1,1]/colSums(tab)[1]
+ppv=tab[2,2]/rowSums(tab)[2]
+f1=2*(sens*ppv)/(sens+ppv)
+
+#CALCULATE EXACT AUC
+ord<-order(probs, decreasing=TRUE)
+probs <- probs[ord]; truth <- truth[ord]
+
+TPR=cumsum(truth)/max(1,sum(truth)) 
+FPR=cumsum(!truth)/max(1,sum(!truth))
+
+dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+n <- length(TPR)
+auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+data.frame(acc,sens,spec,ppv,f1,auc)
+}
+```
+
+```{r}
+class_diag(probs, truth = science1$y)
+```
+The accuracy of the model is 0.5307, its true positive rate is 0.515, and its true negative rate is 0.5455. The positive predictive rate is 0.5320 and the AUC of the model is 0.5335. 
+
+```{r}
+science1$logit<-predict(fit1,type="link")
+science1%>%ggplot(aes(logit,color=sex,fill=sex))+geom_density(alpha=.4)+
+theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab("predictor (logit)")
+
+```
+
+```{r}
+library(plotROC)
+science1$prob <- predict(fit1, type = "response")
+ROCplot <- ggplot(science1) + geom_roc(aes(d = y, m = prob), n.cuts = 0) + geom_segment(aes(x=0,xend=1, y=0, yend = 1), lty=2)
+ROCplot
+calc_auc(ROCplot)
+```
+The area under the curve or the AUC is 0.53349. 
+
+
+##**Part 5: LASSO ** 
+
+```{r}
+fit3<-glm(y~class+Class+like, data=science1, family="binomial")
+coeftest(fit3)
+exp(coef(fit3))
+probs2 <- predict(fit3, type = "response")
+class_diag(probs2, science1$y)
+```
+The model is 0.538 accurate with a true positive rate of 0.5202 and a true negative rate of 0.5557. The positive predictive rate is 0.5397 and auc (area under the curve) is 0.5583. 
+
+```{r}
+set.seed(1234)
+fraction<-0.5 #choose proportion of rows to train
+train_n<-floor(fraction*nrow(science1)) #number of rows to train
+iter <- 500 #number of iterations
+diags<-NULL
+for(i in 1:iter){
+## Create training and test sets
+train_index<-sample(1:nrow(science1),size=train_n)
+train<-science1[train_index,]
+test<-science1[-train_index,]
+truth<-test$y
+## Train model on training set
+fit<-glm(y~(.)^2,data=train,family="binomial")
+## Test model on test set, get diagnostics
+probs<-predict(fit3,newdata = test,type="response")
+diags<-rbind(diags,class_diag(probs,truth))
+}
+summarize_all(diags,mean)
+```
+After performing the cross validation above, the classification metrics slightly changed. A few of the values increased or decreased slightly. The AUC changed very slightly. Since the metrics did not change much, we can indicate that the model is not overfitted.
+
+```{r}
+library(glmnet)
+
+y<-as.matrix(science1$y) #grab response
+x<-model.matrix(y~.,data=science1)[,-1] #grab predictors
+cv <- cv.glmnet(x,y,family="binomial")
+lasso<-glmnet(x,y,family="binomial",lambda=cv$lambda.1se)
+coef(lasso)
+```
+After performing LASSO on the model the only variable retain is the sex of the student. 
+
+```{r}
+set.seed(1234)
+k=10
+data <- science1 %>% sample_frac #put rows of dataset in random order
+folds <- ntile(1:nrow(data),n=10) #create fold labels
+diags<-NULL
+for(i in 1:k){
+train <- data[folds!=i,] #create training set (all but fold i)
+test <- data[folds==i,] #create test set (just fold i)
+truth <- test$y #save truth labels from fold i
+fit <- glm(y~like,
+data=train, family="binomial")
+probs <- predict(fit, newdata=test, type="response")
+diags<-rbind(diags,class_diag(probs,truth))
+}
+diags%>%summarize_all(mean)
+```
+The model's out of sample AUC is very similar (0.533) to the logistic regression above (0.5583).
